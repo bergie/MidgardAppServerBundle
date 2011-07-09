@@ -1,0 +1,10 @@
+servers:
+  -
+    protocol: HTTP
+    socket: 'tcp://127.0.0.1:8001'
+    min-children: 2
+    max-children: 4
+    app:
+      class: \Midgard\AppServerBundle\Aip\Application
+      file: ../../AiP/Application.php
+      middlewares: {}
