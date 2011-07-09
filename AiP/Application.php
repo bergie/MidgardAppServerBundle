@@ -5,7 +5,11 @@ require_once __DIR__.'/../../../../app/bootstrap.php.cache';
 require_once __DIR__.'/../../../../app/AppKernel.php';
 
 use Symfony\Component\HttpFoundation\Request;
-use Midgard\AppServer\AiP\Response;
+use Midgard\AppServer\AiP\Response as AiPResponse;
+use AiP\Middleware\HTTPParser;
+use AiP\Middleware\Session;
+use AiP\Middleware\URLMap;
+use AiP\Middleware\Logger;
 
 class Application
 {
@@ -20,11 +24,11 @@ class Application
     public function __construct()
     {
         $urlmap = array();
-        $urlmap['/'] = new \AiP\Middleware\HTTPParser(new \AiP\Middleware\Session($this));
+        $urlmap['/'] = new HTTPParser(new Session($this));
         // TODO: Add a fileserver for files in web directory
-        $map = new \AiP\Middleware\URLMap($urlmap);
+        $map = new URLMap($urlmap);
 
-        $this->appServer = new \AiP\Middleware\Logger($map, STDOUT);
+        $this->appServer = new Logger($map, STDOUT);
 
         $this->kernel = new \AppKernel('prod', false);
         $this->kernel->loadClassCache();
@@ -87,7 +91,7 @@ class Application
     public function onCoreResponse($event)
     {
         $response = $event->getResponse();
-        $newResponse = new Midgard\AppServerBundle\AiP\Response($response->getContent(), $response->getStatusCode(), $response->headers->all());
+        $newResponse = new AiPResponse($response->getContent(), $response->getStatusCode(), $response->headers->all());
         $event->setResponse($newResponse);
     }
 }
