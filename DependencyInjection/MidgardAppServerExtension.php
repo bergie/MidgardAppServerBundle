@@ -14,6 +14,6 @@ class MidgardAppServerExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('compat.xml');
+        $loader->load('aip.xml');
     }
 }
