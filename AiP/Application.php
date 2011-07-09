@@ -13,9 +13,15 @@ use AiP\Middleware\Logger;
 
 class Application
 {
-    private $appServer = null;
-    private $response = null;
-    private $kernel = null;
+    /**
+     * @var Symfony\Component\HttpFoundation\Response
+     */
+    private $response;
+
+    /**
+     * @var Symfony\Component\HttpKernel\Kernel
+     */
+    private $kernel;
 
     /**
      * Construct prepares the AppServer in PHP URL mappings
@@ -28,7 +34,7 @@ class Application
         // TODO: Add a fileserver for files in web directory
         $map = new URLMap($urlmap);
 
-        $this->appServer = new Logger($map, STDOUT);
+        $appServer = new Logger($map, STDOUT);
 
         $this->kernel = new \AppKernel('prod', false);
         $this->kernel->loadClassCache();
