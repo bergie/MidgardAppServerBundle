@@ -21,6 +21,7 @@ class Application
     {
         $urlmap = array();
         $urlmap['/'] = new \AiP\Middleware\HTTPParser(new \AiP\Middleware\Session($this));
+        // TODO: Add a fileserver for files in web directory
         $map = new \AiP\Middleware\URLMap($urlmap);
 
         $this->appServer = new \AiP\Middleware\Logger($map, STDOUT);
