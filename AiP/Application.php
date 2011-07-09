@@ -47,7 +47,7 @@ class Application
      */
     public function __invoke($context)
     {
-        call_user_func($context['logger'], "Serving request to {$context['env']['REQUEST_URI']}");
+        $this->log($context, "Serving request to {$context['env']['REQUEST_URI']}");
 
         // Prepare Request object
         $request = Request::create($context['env']['REQUEST_URI'], $context['env']['REQUEST_METHOD']);
@@ -58,12 +58,16 @@ class Application
             $this->kernel->handle($request)->send();
         }
         catch (\Exception $e) {
-            call_user_func($context['logger'], "[Exception] " . $e->getMessage());
+            $this->log($context, "[Exception] " . $e->getMessage());
             return array(500, array(), $e->getMessage());
         }
-        call_user_func($context['logger'], "Status " . $this->response->getStatusCode());
 
         return array($this->response->getStatusCode(), $this->getHeaders($this->response), $this->response->getContent());
+    }
+
+    private function log($context, $message)
+    {
+        call_user_func($context['logger'], $message);
     }
 
     /**
