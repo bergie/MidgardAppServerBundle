@@ -66,9 +66,7 @@ class Application
 
     public function onCoreView($event)
     {
-        $response = $event->getControllerResult();
-        $converter = new \Silex\StringResponseConverter();
-        $this->response = $converter->convert($response);
+        $this->response = $event->getControllerResult();
     }
 
     public function onCoreResponse($event)
