@@ -30,8 +30,10 @@ class Application
         $this->kernel->loadClassCache();
     }
 
-   /**
-     * Invoke is run once per each request.
+    /**
+     * Invoke is run once per each request. Here we generate a
+     * Request object, tell Symfony2 to handle it, and eventually
+     * return the Result contents back to AiP
      */
     public function __invoke($context)
     {
@@ -54,6 +56,10 @@ class Application
         return array($this->response->getStatusCode(), $this->getHeaders($this->response), $this->response->getContent());
     }
 
+    /**
+     * Normalize headers from a Symfony2 Response ParameterBag
+     * to the array used by AiP
+     */
     private function getHeaders($response)
     {
         $ret = array();
@@ -65,11 +71,19 @@ class Application
         return $ret;
     }
 
+    /**
+     * Get a reference of the Response object so it can be later
+     * used for the return value of __invoke
+     */
     public function onCoreView($event)
     {
         $this->response = $event->getControllerResult();
     }
 
+    /**
+     * Cast the Response into an AiP Response which doesn't
+     * attempt to send output on its own
+     */
     public function onCoreResponse($event)
     {
         $response = $event->getResponse();
