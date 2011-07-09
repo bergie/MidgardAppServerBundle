@@ -4,9 +4,7 @@ Enables running Symfony2 applications with the AppServer-in-PHP (AiP). AiP simpl
 
 ## How it works
 
-AiP is an application server for PHP applications written in PHP itself. You can either run it as a full HTTP server, in which situation no regular web server like Apache is needed. Or you can set it up to be a FastCGI provider if you run more than just PHP on your server.
-
-AiP requires the `php-cli` package to run.
+AiP is an application server for PHP applications that has been written in PHP itself. You can either run it as a full HTTP server, in which situation no regular web server like Apache is needed. Or you can set it up to be a FastCGI provider if you run more than just PHP on your server.
 
 ### Integration with Symfony2
 
@@ -24,10 +22,10 @@ The AppServerBundle integrates AiP with the Symfony2 framework. The points of in
 
 Install AppServer-in-PHP either via PEAR:
 
-    $ pear channel-discover pear.indeyets.ru
+    $ pear channel-discover pear.indeyets.pp.ru
     $ pear install indeyets/aip
 
-...or by installing the AiP repository under your `vendors` directory.
+...or by installing the AiP repository under your `vendors` directory. AiP requires the `php-cli` package to run as it is basically a command-line PHP script.
 
 Install this bundle under your `vendors` directory and add the `Midgard` namespace to your `autoload.php`.
 
