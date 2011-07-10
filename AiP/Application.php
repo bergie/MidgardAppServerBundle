@@ -4,7 +4,7 @@ namespace Midgard\AppServerBundle\AiP;
 require_once __DIR__.'/../../../../app/AppKernel.php';
 
 use Symfony\Component\HttpFoundation\Request;
-use Midgard\AppServer\AiP\Response as AiPResponse;
+use Midgard\AppServerBundle\AiP\Response as AiPResponse;
 use AiP\Middleware\HTTPParser;
 use AiP\Middleware\Session;
 use AiP\Middleware\URLMap;
@@ -51,17 +51,9 @@ class Application
         // Prepare Request object
         $request = Request::create($context['env']['REQUEST_URI'], $context['env']['REQUEST_METHOD']);
 
-        $this->response = null;
+        $response = $this->kernel->handle($request);
 
-        try {
-            $this->kernel->handle($request)->send();
-        }
-        catch (\Exception $e) {
-            $this->log($context, "[Exception] " . $e->getMessage());
-            return array(500, array(), $e->getMessage());
-        }
-
-        return array($this->response->getStatusCode(), $this->getHeaders($this->response), $this->response->getContent());
+        return array($response->getStatusCode(), $this->getHeaders($response), $response->getContent());
     }
 
     private function log($context, $message)
@@ -82,15 +74,6 @@ class Application
             $ret[] = implode(';', $values);
         }
         return $ret;
-    }
-
-    /**
-     * Get a reference of the Response object so it can be later
-     * used for the return value of __invoke
-     */
-    public function onCoreView($event)
-    {
-        $this->response = $event->getControllerResult();
     }
 
     /**

@@ -15,7 +15,6 @@ The AppServerBundle integrates AiP with the Symfony2 framework. The points of in
 * Your Symfony2 application is started by the `aip` command, which launches the AppServerBundle Application
 * The Application bootstraps Symfony2 and creates an instance of the Symfony2 AppKernel
 * When AiP receives a request, the `__invoke` method of the Application is run, generating a regular Symfony2 Request object and telling AppKernel to Handle it
-* On the `kernel.view` event, the Application takes a reference to the Symfony2 Response object
 * On the `kernel.response` event, the Application replaces the regular Symfony2 Response object with its own Response object which does not attempt to send output
 * When request handling has completed the status code, headers, and contents of the Response object are passed to AiP
 * AiP sends the response to the browser
