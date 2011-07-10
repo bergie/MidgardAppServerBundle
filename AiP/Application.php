@@ -35,7 +35,7 @@ class Application
 
         $appServer = new Logger($map, STDOUT);
 
-        $this->kernel = new \AppKernel('prod', false);
+        $this->kernel = new \AppKernel('dev', false);
         $this->kernel->loadClassCache();
     }
 
