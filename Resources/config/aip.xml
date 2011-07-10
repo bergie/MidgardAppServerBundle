@@ -6,8 +6,7 @@
 
     <services>
         <service id="midgard.appserver.kernel_listener" class="Midgard\AppServerBundle\AiP\Application">
-            <tag name="kernel.listener" event="core.view" method="onCoreView" />
-            <tag name="kernel.listener" event="core.response" method="onCoreResponse" />
+            <tag name="kernel.event_listener" event="kernel.response" method="onCoreResponse" />
         </service>
     </services>
 </container>
