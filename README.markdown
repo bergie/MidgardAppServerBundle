@@ -32,7 +32,11 @@ Install AppServer-in-PHP either via PEAR:
 
 ### AppServerBundle
 
-Install this bundle under your `vendors` directory and add the `Midgard` namespace to your `autoload.php`.
+Install this bundle under your `vendors` directory and add the `Midgard` namespace to your `autoload.php`. You can automate the install by adding the following to your `deps` file:
+
+    [AppServerBundle]
+        git=http://github.com/bergie/MidgardAppServerBundle.git
+        target=Midgard/AppServerBundle
 
 Enable this bundle by adding `new Midgard\AppServerBundle\MidgardAppServerBundle()` to your `AppKernel.php`.
 
