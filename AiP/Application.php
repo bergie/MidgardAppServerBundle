@@ -30,19 +30,13 @@ class Application
      */
     public function __invoke($context)
     {
-        $this->log($context, "Serving request to {$context['env']['REQUEST_URI']}");
-
         // Prepare Request object
+        // TODO: Set possible request parameters etc.
         $request = Request::create($context['env']['REQUEST_URI'], $context['env']['REQUEST_METHOD']);
 
         $response = $this->kernel->handle($request);
 
         return array($response->getStatusCode(), $this->getHeaders($response), $response->getContent());
-    }
-
-    private function log($context, $message)
-    {
-        call_user_func($context['logger'], $message);
     }
 
     /**
