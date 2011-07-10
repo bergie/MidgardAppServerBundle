@@ -1,22 +1,13 @@
 <?php
 namespace Midgard\AppServerBundle\AiP;
 
-require_once __DIR__.'/../../../../app/AppKernel.php';
+require __DIR__.'/../../../../app/AppKernel.php';
 
 use Symfony\Component\HttpFoundation\Request;
 use Midgard\AppServerBundle\AiP\Response as AiPResponse;
-use AiP\Middleware\HTTPParser;
-use AiP\Middleware\Session;
-use AiP\Middleware\URLMap;
-use AiP\Middleware\Logger;
 
 class Application
 {
-    /**
-     * @var Symfony\Component\HttpFoundation\Response
-     */
-    private $response;
-
     /**
      * @var Symfony\Component\HttpKernel\Kernel
      */
@@ -28,13 +19,6 @@ class Application
      */
     public function __construct()
     {
-        $urlmap = array();
-        $urlmap['/'] = new HTTPParser(new Session($this));
-        // TODO: Add a fileserver for files in web directory
-        $map = new URLMap($urlmap);
-
-        $appServer = new Logger($map, STDOUT);
-
         $this->kernel = new \AppKernel('dev', false);
         $this->kernel->loadClassCache();
     }

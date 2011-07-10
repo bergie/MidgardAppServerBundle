@@ -5,6 +5,6 @@ servers:
     min-children: 2
     max-children: 4
     app:
-      class: Midgard\AppServerBundle\AiP\Application
+      class: Midgard\AppServerBundle\AiP\Runner
       file: bootstrap.php.cache
       middlewares: {}
