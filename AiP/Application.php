@@ -11,7 +11,7 @@ class Application
     /**
      * @var Symfony\Component\HttpKernel\Kernel
      */
-    private $kernel;
+    private static $kernel;
 
     /**
      * Construct prepares the AppServer in PHP URL mappings
@@ -19,8 +19,11 @@ class Application
      */
     public function __construct()
     {
-        $this->kernel = new \AppKernel('dev', false);
-        $this->kernel->loadClassCache();
+        if (self::$kernel) {
+            return;
+        }
+        self::$kernel = new \AppKernel('dev', false);
+        self::$kernel->loadClassCache();
     }
 
     /**
@@ -34,7 +37,7 @@ class Application
         // TODO: Set possible request parameters etc.
         $request = Request::create($context['env']['REQUEST_URI'], $context['env']['REQUEST_METHOD']);
 
-        $response = $this->kernel->handle($request);
+        $response = self::$kernel->handle($request);
 
         return array($response->getStatusCode(), $this->getHeaders($response), $response->getContent());
     }
