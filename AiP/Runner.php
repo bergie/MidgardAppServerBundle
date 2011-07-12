@@ -25,7 +25,15 @@ class Runner
         $urlmap['/'] = new HTTPParser(new Session(new Application()));
         $urlmap['/favicon.ico'] = function($ctx) { return array(404, array(), ''); };
 
-        $web_root = realpath(__DIR__.'/../../../../web'); 
+        $urlmap = $this->addFileServers(realpath(__DIR__.'/../../../../web'), $urlmap); 
+
+        $map = new URLMap($urlmap);
+
+        $this->app = new Logger($map, STDOUT);
+    }
+
+    private function addFileServers($web_root, array $urlmap)
+    {
         $web_dirs = scandir($web_root);
         foreach ($web_dirs as $web_dir) {
             if (substr($web_dir, 0, 1) == '.') {
@@ -36,10 +44,7 @@ class Runner
             }
             $urlmap["/{$web_dir}"] = new FileServe("{$web_root}/{$web_dir}", 4000000);
         }
-
-        $map = new URLMap($urlmap);
-
-        $this->app = new Logger($map, STDOUT);
+        return $urlmap;
     }
 
     /**
