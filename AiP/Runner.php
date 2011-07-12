@@ -24,7 +24,19 @@ class Runner
         $urlmap = array();
         $urlmap['/'] = new HTTPParser(new Session(new Application()));
         $urlmap['/favicon.ico'] = function($ctx) { return array(404, array(), ''); };
-        $urlmap['/bundles'] = new FileServe(realpath(__DIR__.'/../../../../web/bundles'), 4000000);
+
+        $web_root = realpath(__DIR__.'/../../../../web'); 
+        $web_dirs = scandir($web_root);
+        foreach ($web_dirs as $web_dir) {
+            if (substr($web_dir, 0, 1) == '.') {
+                continue;
+            }
+            if (!is_dir("{$web_root}/{$web_dir}")) {
+                continue;
+            }
+            $urlmap["/{$web_dir}"] = new FileServe("{$web_root}/{$web_dir}", 4000000);
+        }
+
         $map = new URLMap($urlmap);
 
         $this->app = new Logger($map, STDOUT);

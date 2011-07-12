@@ -35,7 +35,6 @@ class Application
     {
         // Prepare Request object
         $request = $this->ctx2Request($context);
-
         $response = self::$kernel->handle($request);
 
         foreach ($response->headers->getCookies() as $cookie) {
