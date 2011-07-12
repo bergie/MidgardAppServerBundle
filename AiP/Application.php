@@ -38,6 +38,10 @@ class Application
 
         $response = self::$kernel->handle($request);
 
+        foreach ($response->headers->getCookies() as $cookie) {
+            $context['_COOKIE']->setcookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
+        }
+
         return array($response->getStatusCode(), $this->getHeaders($response), $response->getContent());
     }
 
