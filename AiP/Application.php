@@ -34,12 +34,28 @@ class Application
     public function __invoke($context)
     {
         // Prepare Request object
-        // TODO: Set possible request parameters etc.
-        $request = Request::create($context['env']['REQUEST_URI'], $context['env']['REQUEST_METHOD']);
+        $request = $this->ctx2Request($context);
 
         $response = self::$kernel->handle($request);
 
         return array($response->getStatusCode(), $this->getHeaders($response), $response->getContent());
+    }
+
+    private function ctx2Request($context)
+    {
+        $uri = "http://{$context['env']['HTTP_HOST']}{$context['env']['REQUEST_URI']}";
+        $method = $context['env']['REQUEST_METHOD'];
+        $server = $context['env'];
+
+        $parameters = array();
+        $files = array();
+        if ($method == 'POST') {
+            $parameters = $context['_POST'];
+            $files = $context['_FILES'];
+        }
+        $cookies = $context['_COOKIE']->__toArray();
+
+        return Request::create($uri, $method, $parameters, $cookies, $files);
     }
 
     /**
