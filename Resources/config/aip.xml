@@ -8,5 +8,9 @@
         <service id="midgard.appserver.kernel_listener" class="Midgard\AppServerBundle\AiP\Application">
             <tag name="kernel.event_listener" event="kernel.response" method="onCoreResponse" />
         </service>
+        <service id="session.storage.native" class="Symfony\Component\HttpFoundation\SessionStorage\FilesystemSessionStorage">
+            <argument>%kernel.cache_dir%/sessions</argument>
+            <argument>%session.storage.options%</argument> 
+        </service>
     </services>
 </container>

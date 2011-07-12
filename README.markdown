@@ -44,6 +44,8 @@ Enable this bundle by adding `new Midgard\AppServerBundle\MidgardAppServerBundle
 
 Copy the `aip.yaml.example` file from this bundle to your `app` directory. You can edit it as necessary. By default it sets up two workers to listen to `http://localhost:8001`.
 
+AppServerBundle will not work with the Symfony's NativeSessionStorage implementation, so it automatically replaces that with FilesystemSessionStorage.
+
 ## Usage
 
 Start your server with:
