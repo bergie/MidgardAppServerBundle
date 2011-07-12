@@ -1,8 +1,6 @@
 <?php
 namespace Midgard\AppServerBundle\AiP;
 
-require __DIR__.'/../../../../app/AppKernel.php';
-
 use Symfony\Component\HttpFoundation\Request;
 use Midgard\AppServerBundle\AiP\Response as AiPResponse;
 
@@ -17,12 +15,16 @@ class Application
      * Construct prepares the AppServer in PHP URL mappings
      * and is run once. It also loads the Symfony Application kernel
      */
-    public function __construct()
+    public function __construct($kernel = 'AppKernel', $environment = 'dev')
     {
         if (self::$kernel) {
             return;
         }
-        self::$kernel = new \AppKernel('dev', false);
+
+        require __DIR__ . "/../../../../app/{$kernel}.php";
+        $kernel_class = "\\{$kernel}";
+
+        self::$kernel = new $kernel_class($environment, false);
         self::$kernel->loadClassCache();
     }
 

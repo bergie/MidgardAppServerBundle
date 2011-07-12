@@ -21,11 +21,25 @@ class Runner
      */
     public function __construct()
     {
+        $symfony_root = realpath(__DIR__.'/../../../..');
+        $aip_config = "{$symfony_root}/" . array_pop($_SERVER['argv']);
+        if (!file_exists($aip_config)) {
+            throw new \Exception("No config file '{$aip_config}' found");
+        }
+        $config = \pakeYaml::loadFile($aip_config);
+        if (!isset($config['symfony.kernels'])) {
+            throw new \Exception("No symfony.kernels configured in {$aip_config}");
+        }
+
         $urlmap = array();
-        $urlmap['/'] = new HTTPParser(new Session(new Application()));
+
+        foreach ($config['symfony.kernels'] as $kernel) {
+            $urlmap[$kernel['path']] = new HTTPParser(new Session(new Application($kernel['kernel'], $kernel['environment'])));
+        }
+
         $urlmap['/favicon.ico'] = function($ctx) { return array(404, array(), ''); };
 
-        $urlmap = $this->addFileServers(realpath(__DIR__.'/../../../../web'), $urlmap); 
+        $urlmap = $this->addFileServers("{$symfony_root}/web", $urlmap); 
 
         $map = new URLMap($urlmap);
 

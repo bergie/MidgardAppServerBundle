@@ -8,3 +8,8 @@ servers:
       class: Midgard\AppServerBundle\AiP\Runner
       file: bootstrap.php.cache
       middlewares: {}
+symfony.kernels:
+  -
+    path: /
+    kernel: AppKernel
+    environment: dev
