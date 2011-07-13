@@ -21,44 +21,58 @@ class Runner
      */
     public function __construct()
     {
-        $symfony_root = realpath(__DIR__.'/../../../..');
-        $aip_config = "{$symfony_root}/" . array_pop($_SERVER['argv']);
-        if (!file_exists($aip_config)) {
-            throw new \Exception("No config file '{$aip_config}' found");
-        }
-        $config = \pakeYaml::loadFile($aip_config);
-        if (!isset($config['symfony.kernels'])) {
-            throw new \Exception("No symfony.kernels configured in {$aip_config}");
-        }
+        $symfonyRoot = realpath(__DIR__.'/../../../..');
+        $config = $this->loadConfig($symfonyRoot);
 
-        $urlmap = array();
+        $urlMap = array();
 
-        foreach ($config['symfony.kernels'] as $kernel) {
-            $urlmap[$kernel['path']] = new HTTPParser(new Session(new Application($kernel['kernel'], $kernel['environment'])));
-        }
+        $urlMap['/favicon.ico'] = function($ctx) { return array(404, array(), ''); };
 
-        $urlmap['/favicon.ico'] = function($ctx) { return array(404, array(), ''); };
+        $urlMap = array_merge($urlMap, $this->addKernels($config));
+        $urlMap = array_merge($urlMap, $this->addFileServers("{$symfonyRoot}/web")); 
 
-        $urlmap = $this->addFileServers("{$symfony_root}/web", $urlmap); 
-
-        $map = new URLMap($urlmap);
+        $map = new URLMap($urlMap);
 
         $this->app = new Logger($map, STDOUT);
     }
 
-    private function addFileServers($web_root, array $urlmap)
+    private function loadConfig($symfonyRoot)
     {
-        $web_dirs = scandir($web_root);
-        foreach ($web_dirs as $web_dir) {
-            if (substr($web_dir, 0, 1) == '.') {
-                continue;
-            }
-            if (!is_dir("{$web_root}/{$web_dir}")) {
-                continue;
-            }
-            $urlmap["/{$web_dir}"] = new FileServe("{$web_root}/{$web_dir}", 4000000);
+        $aipConfig = "{$symfonyRoot}/" . array_pop($_SERVER['argv']);
+        if (!file_exists($aipConfig)) {
+            throw new \Exception("No config file '{$aipConfig}' found");
         }
-        return $urlmap;
+        return \pakeYaml::loadFile($aipConfig);
+    }
+
+    private function addKernels(array $config)
+    {
+        $urlMap = array();
+        if (!isset($config['symfony.kernels'])) {
+            throw new \Exception("No symfony.kernels configured in {$aipConfig}");
+        }
+
+        foreach ($config['symfony.kernels'] as $kernel) {
+            $urlMap[$kernel['path']] = new HTTPParser(new Session(new Application($kernel['kernel'], $kernel['kernelFile'], $kernel['environment'])));
+        }
+
+        return $urlMap;
+    }
+
+    private function addFileServers($webRoot)
+    {
+        $urlMap = array();
+        $webDirs = scandir($webRoot);
+        foreach ($webDirs as $webDir) {
+            if (substr($webDir, 0, 1) == '.') {
+                continue;
+            }
+            if (!is_dir("{$webRoot}/{$webDir}")) {
+                continue;
+            }
+            $urlMap["/{$webDir}"] = new FileServe("{$webRoot}/{$webDir}", 4000000);
+        }
+        return $urlMap;
     }
 
     /**

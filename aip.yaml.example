@@ -12,4 +12,5 @@ symfony.kernels:
   -
     path: /
     kernel: AppKernel
+    kernelFile: AppKernel.php
     environment: dev

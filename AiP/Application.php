@@ -15,16 +15,16 @@ class Application
      * Construct prepares the AppServer in PHP URL mappings
      * and is run once. It also loads the Symfony Application kernel
      */
-    public function __construct($kernel = 'AppKernel', $environment = 'dev')
+    public function __construct($kernel, $kernelFile, $environment = 'dev')
     {
         if (self::$kernel) {
             return;
         }
 
-        require __DIR__ . "/../../../../app/{$kernel}.php";
-        $kernel_class = "\\{$kernel}";
+        require __DIR__ . "/../../../../app/{$kernelFile}";
+        $kernelClass = "\\{$kernel}";
 
-        self::$kernel = new $kernel_class($environment, false);
+        self::$kernel = new $kernelClass($environment, false);
         self::$kernel->loadClassCache();
     }
 
