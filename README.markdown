@@ -12,10 +12,9 @@ AiP is an application server for PHP applications that has been written in PHP i
 
 The AppServerBundle integrates AiP with the Symfony2 framework. The points of integration are the following:
 
-* Your Symfony2 application is started by the `aip` command, which launches the AppServerBundle Application
-* The Application bootstraps Symfony2 and creates an instance of the Symfony2 AppKernel
+* Your Symfony2 application is started by the `aip app` command, which launches the AppServerBundle Application
+* The Application bootstraps Symfony2 and creates instances of the Symfony2 AppKernels configured in `aip.yml`
 * When AiP receives a request, the `__invoke` method of the Application is run, generating a regular Symfony2 Request object and telling AppKernel to Handle it
-* On the `kernel.response` event, the Application replaces the regular Symfony2 Response object with its own Response object which does not attempt to send output
 * When request handling has completed the status code, headers, and contents of the Response object are passed to AiP
 * AiP sends the response to the browser
 
@@ -38,13 +37,29 @@ Install this bundle under your `vendors` directory and add the `Midgard` namespa
         git=http://github.com/bergie/MidgardAppServerBundle.git
         target=Midgard/AppServerBundle
 
-Enable this bundle by adding `new Midgard\AppServerBundle\MidgardAppServerBundle()` to your `AppKernel.php`.
-
 ### Application server configuration
 
-Copy the `aip.yaml.example` file from this bundle to your `app` directory. You can edit it as necessary. By default it sets up two workers to listen to `http://localhost:8001`.
+Copy the `aip.yaml.example` file from this bundle to your `app` directory. You can edit it as necessary. By default it sets up two workers to listen to `http://localhost:8001`, running your `AppKernel` at `/`.
 
-AppServerBundle will not work with the Symfony's NativeSessionStorage implementation, so it automatically replaces that with FilesystemSessionStorage.
+If you have multiple application kernels, you have to configure them in your `aip.yml`. For example, this is how [Lichess](https://github.com/ornicar/lichess/) can be configured:
+
+    symfony.kernels:
+      -
+        path: /
+        kernel: AppKernel
+        kernelFile: AppKernel.php
+        environment: dev
+      -
+        path: /xhr_dev.php
+        kernel: XhrKernel
+        kernelFile: ../xhr/XhrKernel.php
+        environment: dev
+
+AppServerBundle will not work with the Symfony's `NativeSessionStorage` implementation, so you have to switch that to some other `SessionStorage` implementation in `config.yml`. For example:
+
+    framework:
+        session:
+            storage_id: session.storage.filesystem
 
 ## Usage
 
@@ -54,7 +69,7 @@ Start your server with:
 
 ## Contributing
 
-The AppServerBundle is still under heavy development, and is so not likely to support all of Symfony2's feature set. Contributions for making it more reliable are very welcome.
+The AppServerBundle is still under heavy development, and you may still run into issues, or find things that could be optimized. Contributions for making it more reliable are very welcome.
 
 Just fork the AppServerBundle repository on GitHub and send pull requests.
 
