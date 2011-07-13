@@ -49,11 +49,13 @@ If you have multiple application kernels, you have to configure them in your `ai
         kernel: AppKernel
         kernelFile: AppKernel.php
         environment: dev
+        debug: false
       -
         path: /xhr_dev.php
         kernel: XhrKernel
         kernelFile: ../xhr/XhrKernel.php
         environment: dev
+        debug: false
 
 AppServerBundle will not work with the Symfony's `NativeSessionStorage` implementation, so you have to switch that to some other `SessionStorage` implementation in `config.yml`. For example:
 

@@ -14,3 +14,4 @@ symfony.kernels:
     kernel: AppKernel
     kernelFile: AppKernel.php
     environment: dev
+    debug: false

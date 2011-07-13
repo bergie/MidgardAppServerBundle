@@ -21,7 +21,7 @@ class Application
         require __DIR__ . "/../../../../app/{$config['kernelFile']}";
         $kernelClass = "\\{$config['kernel']}";
 
-        $this->kernel = new $kernelClass($config['environment'], false);
+        $this->kernel = new $kernelClass($config['environment'], $config['debug']);
         $this->kernel->loadClassCache();
 
         $this->prefix = $config['path'];
