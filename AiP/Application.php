@@ -55,13 +55,13 @@ class Application
         $_SERVER['SCRIPT_FILENAME'] = "/some/path{$this->prefix}";
 
         if (isset($context['_GET'])) {
-            $_POST = $context['_GET'];
+            $_GET = $context['_GET'];
         }
         if (isset($context['_POST'])) {
             $_POST = $context['_POST'];
         }
         if (isset($context['_FILES'])) {
-            $_POST = $context['_FILES'];
+            $_FILES = $context['_FILES'];
         }
         $_COOKIE = $context['_COOKIE']->__toArray();
         return Request::createFromGlobals();
