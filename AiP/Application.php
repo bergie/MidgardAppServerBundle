@@ -2,30 +2,29 @@
 namespace Midgard\AppServerBundle\AiP;
 
 use Symfony\Component\HttpFoundation\Request;
-use Midgard\AppServerBundle\AiP\Response as AiPResponse;
 
 class Application
 {
     /**
      * @var Symfony\Component\HttpKernel\Kernel
      */
-    private static $kernel;
+    private $kernel;
+
+    private $prefix;
 
     /**
      * Construct prepares the AppServer in PHP URL mappings
      * and is run once. It also loads the Symfony Application kernel
      */
-    public function __construct($kernel, $kernelFile, $environment = 'dev')
+    public function __construct(array $config)
     {
-        if (self::$kernel) {
-            return;
-        }
+        require __DIR__ . "/../../../../app/{$config['kernelFile']}";
+        $kernelClass = "\\{$config['kernel']}";
 
-        require __DIR__ . "/../../../../app/{$kernelFile}";
-        $kernelClass = "\\{$kernel}";
+        $this->kernel = new $kernelClass($config['environment'], false);
+        $this->kernel->loadClassCache();
 
-        self::$kernel = new $kernelClass($environment, false);
-        self::$kernel->loadClassCache();
+        $this->prefix = $config['path'];
     }
 
     /**
@@ -37,7 +36,7 @@ class Application
     {
         // Prepare Request object
         $request = $this->ctx2Request($context);
-        $response = self::$kernel->handle($request);
+        $response = $this->kernel->handle($request);
 
         foreach ($response->headers->getCookies() as $cookie) {
             $context['_COOKIE']->setcookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
@@ -48,7 +47,13 @@ class Application
 
     private function ctx2Request($context)
     {
-        $uri = "http://{$context['env']['HTTP_HOST']}{$context['env']['REQUEST_URI']}";
+        $requestUri = $context['env']['REQUEST_URI'];
+        if (   strlen($this->prefix) > 1
+            && substr($requestUri, 0, strlen($this->prefix)) == $this->prefix) {
+            $requestUri = substr($requestUri, strlen($this->prefix));
+        }
+
+        $uri = "http://{$context['env']['HTTP_HOST']}{$requestUri}";
         $method = $context['env']['REQUEST_METHOD'];
         $server = $context['env'];
 
@@ -76,16 +81,5 @@ class Application
             $ret[] = implode(';', $values);
         }
         return $ret;
-    }
-
-    /**
-     * Cast the Response into an AiP Response which doesn't
-     * attempt to send output on its own
-     */
-    public function onCoreResponse($event)
-    {
-        $response = $event->getResponse();
-        $newResponse = new AiPResponse($response->getContent(), $response->getStatusCode(), $response->headers->all());
-        $event->setResponse($newResponse);
     }
 }

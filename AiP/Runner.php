@@ -53,7 +53,7 @@ class Runner
         }
 
         foreach ($config['symfony.kernels'] as $kernel) {
-            $urlMap[$kernel['path']] = new HTTPParser(new Session(new Application($kernel['kernel'], $kernel['kernelFile'], $kernel['environment'])));
+            $urlMap[$kernel['path']] = new HTTPParser(new Session(new Application($kernel)));
         }
 
         return $urlMap;
