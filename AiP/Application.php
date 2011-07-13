@@ -48,24 +48,23 @@ class Application
     private function ctx2Request($context)
     {
         $requestUri = $context['env']['REQUEST_URI'];
-        if (   strlen($this->prefix) > 1
-            && substr($requestUri, 0, strlen($this->prefix)) == $this->prefix) {
-            $requestUri = substr($requestUri, strlen($this->prefix));
+        $_SERVER = $context['env'];
+
+        $uriParts = explode('?', $requestUri);
+        $_SERVER['PHP_SELF'] = $uriParts[0];
+        $_SERVER['SCRIPT_FILENAME'] = "/some/path{$this->prefix}";
+
+        if (isset($context['_GET'])) {
+            $_POST = $context['_GET'];
         }
-
-        $uri = "http://{$context['env']['HTTP_HOST']}{$requestUri}";
-        $method = $context['env']['REQUEST_METHOD'];
-        $server = $context['env'];
-
-        $parameters = array();
-        $files = array();
-        if ($method == 'POST') {
-            $parameters = $context['_POST'];
-            $files = $context['_FILES'];
+        if (isset($context['_POST'])) {
+            $_POST = $context['_POST'];
         }
-        $cookies = $context['_COOKIE']->__toArray();
-
-        return Request::create($uri, $method, $parameters, $cookies, $files);
+        if (isset($context['_FILES'])) {
+            $_POST = $context['_FILES'];
+        }
+        $_COOKIE = $context['_COOKIE']->__toArray();
+        return Request::createFromGlobals();
     }
 
     /**
