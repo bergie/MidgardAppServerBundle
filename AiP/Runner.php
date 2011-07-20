@@ -73,11 +73,15 @@ class Runner
                     if (substr($bundleDir, 0, 1) == '.') {
                         continue;
                     }
-                    $target = readlink("{$webRoot}/bundles/{$bundleDir}");
+                    $target = "{$webRoot}/bundles/{$bundleDir}";
+                    if (is_link($target)) {
+                        $target = readlink("{$webRoot}/bundles/{$bundleDir}");
+                    }
+
                     if (!file_exists($target)) {
                         continue;
                     }
-                    $urlMap["/bundles/{$bundleDir}"] = new FileServe(readlink("{$webRoot}/bundles/{$bundleDir}"), 4000000);
+                    $urlMap["/bundles/{$bundleDir}"] = new FileServe($target, 4000000);
                 }
                 continue;
             }
