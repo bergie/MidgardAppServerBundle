@@ -20,10 +20,9 @@ class Application
     {
         require __DIR__ . "/../../../../app/{$config['kernelFile']}";
         $kernelClass = "\\{$config['kernel']}";
-
         $this->kernel = new $kernelClass($config['environment'], $config['debug']);
         $this->kernel->loadClassCache();
-
+        $this->kernel->boot();
         $this->prefix = $config['path'];
     }
 
@@ -36,11 +35,14 @@ class Application
     {
         // Prepare Request object
         $request = $this->ctx2Request($context);
+        $this->kernel->getContainer()->get('session.storage')->setContext($context);
         $response = $this->kernel->handle($request);
 
         foreach ($response->headers->getCookies() as $cookie) {
             $context['_COOKIE']->setcookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
         }
+
+        $this->kernel->getContainer()->get('session.storage')->commitSession();
 
         return array($response->getStatusCode(), $this->getHeaders($response), $response->getContent());
     }
@@ -64,6 +66,7 @@ class Application
             $_FILES = $context['_FILES'];
         }
         $_COOKIE = $context['_COOKIE']->__toArray();
+
         return Request::createFromGlobals();
     }
 
