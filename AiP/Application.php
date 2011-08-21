@@ -58,9 +58,11 @@ class Application
 
         if (isset($context['_GET'])) {
             $_GET = $context['_GET'];
+            $_REQUEST = $_GET;
         }
         if (isset($context['_POST'])) {
             $_POST = $context['_POST'];
+            $_REQUEST = $_POST;
         }
         if (isset($context['_FILES'])) {
             $_FILES = $context['_FILES'];
