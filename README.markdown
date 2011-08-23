@@ -57,11 +57,11 @@ If you have multiple application kernels, you have to configure them in your `ai
         environment: dev
         debug: false
 
-AppServerBundle will not work with the Symfony's `NativeSessionStorage` implementation, so you have to switch that to some other `SessionStorage` implementation in `config.yml`. For example:
+AppServerBundle will not work with the Symfony's `NativeSessionStorage` implementation, so it supplies its own `SessionStorage` implementation. Switch to that in `config.yml`:
 
     framework:
         session:
-            storage_id: session.storage.filesystem
+            storage_id: session.storage.aip
 
 ## Usage
 
