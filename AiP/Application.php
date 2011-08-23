@@ -27,6 +27,11 @@ class Application
         $this->prefix = $config['path'];
     }
 
+    public function getKernel()
+    {
+        return $this->kernel;
+    }
+
     /**
      * Invoke is run once per each request. Here we generate a
      * Request object, tell Symfony2 to handle it, and eventually

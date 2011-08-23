@@ -15,6 +15,8 @@ class Runner
      */
     private $app;
 
+    private $kernels = array();
+
     /**
      * Construct prepares the AppServer in PHP URL mappings
      * and is run once. It also loads the Symfony Application kernel
@@ -53,7 +55,9 @@ class Runner
         }
 
         foreach ($config['symfony.kernels'] as $kernel) {
-            $urlMap[$kernel['path']] = new HTTPParser(new Session(new Application($kernel)));
+            $app = new Application($kernel);
+            $this->kernels[] = $app->getKernel();
+            $urlMap[$kernel['path']] = new HTTPParser(new Session($app));
         }
 
         return $urlMap;
@@ -90,6 +94,38 @@ class Runner
             }
             $urlMap["/{$webDir}"] = new FileServe("{$webRoot}/{$webDir}", 4000000);
         }
+        
+        $urlMap = array_merge($urlMap, $this->addMidcomFileServers());
+
+        return $urlMap;
+    }
+
+    private function addMidcomFileServers()
+    {
+        $urlMap = array();
+
+        // Special handling for MidCOM compatibility bundle web dirs
+        foreach ($this->kernels as $kernel) {
+            $container = $kernel->getContainer();
+            if (!$container->hasParameter('midgard.midcomcompat.root')) {
+                continue;
+            }
+
+            $midcomRoot = $container->getParameter('midgard.midcomcompat.root');
+            $staticRoot = realpath("{$midcomRoot}/../static");
+            if (!file_exists($staticRoot)) {
+                continue;
+            }
+
+            $webDirs = scandir($staticRoot);
+            foreach ($webDirs as $webDir) {
+                if (substr($webDir, 0, 1) == '.') {
+                    continue;
+                }
+                $urlMap["/midcom-static/{$webDir}"] = new FileServe("{$staticRoot}/{$webDir}", 4000000);
+            }
+        }
+
         return $urlMap;
     }
 
