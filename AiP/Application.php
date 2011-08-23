@@ -2,6 +2,7 @@
 namespace Midgard\AppServerBundle\AiP;
 
 use Symfony\Component\HttpFoundation\Request;
+use Midgard\AppServerBundle\AiP\SessionStorage\AiPSessionStorage; 
 
 class Application
 {
@@ -35,14 +36,21 @@ class Application
     {
         // Prepare Request object
         $request = $this->ctx2Request($context);
-        $this->kernel->getContainer()->get('session.storage')->setContext($context);
+
+        $session = $this->kernel->getContainer()->get('session.storage');
+        if ($session instanceof AiPSessionStorage) {
+            $session->setContext($context);
+        }
+
         $response = $this->kernel->handle($request);
 
         foreach ($response->headers->getCookies() as $cookie) {
             $context['_COOKIE']->setcookie($cookie->getName(), $cookie->getValue(), $cookie->getExpiresTime(), $cookie->getPath(), $cookie->getDomain(), $cookie->isSecure(), $cookie->isHttpOnly());
         }
 
-        $this->kernel->getContainer()->get('session.storage')->commitSession();
+        if ($session instanceof AiPSessionStorage) {
+            $session->commitSession();
+        }
 
         return array($response->getStatusCode(), $this->getHeaders($response), $response->getContent());
     }
