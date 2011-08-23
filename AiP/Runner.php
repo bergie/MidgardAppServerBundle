@@ -112,6 +112,21 @@ class Runner
             }
 
             $midcomRoot = $container->getParameter('midgard.midcomcompat.root');
+            
+            $themesRoot = realpath("{$midcomRoot}/../themes");
+            if (file_exists($themesRoot)) {
+                $themeDirs = scandir($themesRoot);
+                foreach ($themeDirs as $themeDir) {
+                    if (substr($themeDir, 0, 1) == '.') {
+                        continue;
+                    }
+                    if (!file_exists("{$themesRoot}/{$themeDir}/static")) {
+                        continue;
+                    }
+                    $urlMap["/midcom-static/{$themeDir}"] = new FileServe("{$themesRoot}/{$themeDir}/static", 4000000);
+                }
+            }
+
             $staticRoot = realpath("{$midcomRoot}/../static");
             if (!file_exists($staticRoot)) {
                 continue;
